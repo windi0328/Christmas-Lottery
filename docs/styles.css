@@ -936,18 +936,17 @@ button, input, textarea, select { font: inherit; }
     .hamburger-button {
         display: inline-flex;
         position: absolute;
-        left: 50%;
-        top: 5.5rem;
-        transform: translateX(-50%);
-        width: 4rem;
-        height: 4rem;
+        right: 1rem;
+        top: 1rem;
+        width: 3.4rem;
+        height: 3.4rem;
         background: rgba(255, 255, 255, 0.12);
     }
 
     .nav-links {
         display: none;
         width: 100%;
-        padding: 5.5rem 1rem 0.75rem;
+        padding: 4.6rem 1rem 0.75rem;
         border-radius: 36px;
         background: rgba(11, 38, 29, 0.86);
     }
