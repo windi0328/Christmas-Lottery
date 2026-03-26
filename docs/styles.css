@@ -945,10 +945,16 @@ button, input, textarea, select { font: inherit; }
 
     .nav-links {
         display: none;
+        position: absolute;
+        top: calc(100% + 0.75rem);
+        left: 0;
+        right: 0;
         width: 100%;
-        padding: 4.6rem 1rem 0.75rem;
+        padding: 1rem;
         border-radius: 36px;
         background: rgba(11, 38, 29, 0.86);
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.18);
+        z-index: 5;
     }
 
     .nav-links.open {
