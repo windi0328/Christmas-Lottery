@@ -37,7 +37,12 @@
                     <small>Christmas Gift Draw</small>
                 </span>
             </a>
-            <nav class="nav-links">
+            <button class="hamburger-button" id="hamburger-button" type="button" aria-label="開啟選單" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav-links" id="nav-menu">
                 <button class="tab-link active" type="button" data-tab-target="settings">活動設定</button>
                 <button class="tab-link" type="button" data-tab-target="participants">名單管理</button>
                 <button class="tab-link" type="button" data-tab-target="draw">抽獎 / 結果</button>
@@ -94,21 +99,13 @@
 
         <div class="container flash-stack" id="flash-stack" aria-live="polite"></div>
 
-        <div class="container event-toolbar">
-            <label class="event-picker">
-                <span>目前活動</span>
-                <select id="active-event-select"></select>
-            </label>
-            <button id="create-sample-button" class="btn btn-ghost" type="button">建立空白活動</button>
-        </div>
-
         <section class="container tab-section active" id="tab-settings">
             <div class="section-shell">
                 <div class="section-header">
                     <div>
                         <span class="pill">Page 1</span>
                         <h2>活動設定頁</h2>
-                        <p>建立活動、切換活動與刪除活動都在這裡完成。</p>
+                        <p>建立活動與刪除活動都在這裡完成，整個流程只保留一個活動。</p>
                     </div>
                 </div>
 
@@ -144,12 +141,12 @@
                     </article>
 
                     <article class="panel-card">
-                        <h3>活動列表</h3>
-                        <p>點選任一活動，就能在下方分頁管理名單與抽獎。</p>
+                        <h3>目前活動摘要</h3>
+                        <p>這個版本只會保留一個活動，適合同一支手機上快速完成整個交換流程。</p>
                         <div id="event-list" class="event-grid single-column"></div>
                         <div id="event-empty" class="empty-state compact">
                             <h3>還沒有活動</h3>
-                            <p>先建立第一個活動，就可以開始輸入名單。</p>
+                            <p>先輸入活動名稱後按「儲存活動」，就能繼續建立名單。</p>
                         </div>
                     </article>
                 </div>
@@ -202,7 +199,7 @@
                         <p>一鍵抽出全部結果。揭曉前不會先顯示抽到誰，必須逐一點擊參與者才會看到。</p>
                     </div>
                     <div class="detail-actions">
-                        <button id="draw-button" class="btn btn-gold" type="button">開始公平抽籤</button>
+                        <button id="draw-button" class="btn btn-gold" type="button">開始抽獎</button>
                         <button id="reset-draw-button" class="btn btn-ghost" type="button">重抽</button>
                     </div>
                 </div>
@@ -232,7 +229,7 @@
                     <div id="reveal-list" class="participant-grid"></div>
                     <div id="reveal-empty" class="empty-state compact">
                         <h3>尚未抽籤</h3>
-                        <p>請先建立名單並按下「開始公平抽籤」。</p>
+                            <p>請先建立名單並按下「開始抽獎」。</p>
                     </div>
                 </article>
             </div>
@@ -248,9 +245,6 @@
             <h3 class="event-name"></h3>
             <p class="event-description"></p>
             <dl class="event-meta"></dl>
-            <div class="event-actions">
-                <button class="btn btn-christmas select-event" type="button">切換活動</button>
-            </div>
         </article>
     </template>
 
@@ -268,6 +262,7 @@
             <h4 class="participant-name"></h4>
             <p class="participant-hint">點擊這張卡片，準備揭曉這位參與者抽到的人。</p>
             <button class="btn btn-christmas prepare-reveal" type="button">選擇這位參與者</button>
+            <p class="participant-match hidden"></p>
         </article>
     </template>
 

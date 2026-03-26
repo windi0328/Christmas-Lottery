@@ -1,10 +1,10 @@
-const STORAGE_KEY = "christmas-lottery-pages-state-v2";
+const STORAGE_KEY = "christmas-lottery-pages-state-v3";
 
 const state = loadState();
 const ui = {
-    selectedEventId: state.events[0]?.id ?? null,
     activeTab: "settings",
-    pendingReveal: null
+    pendingReveal: null,
+    menuOpen: false
 };
 
 const els = {
@@ -12,8 +12,8 @@ const els = {
     statsParticipants: document.querySelector("#stats-participants"),
     statsDrawn: document.querySelector("#stats-drawn"),
     flashStack: document.querySelector("#flash-stack"),
-    activeEventSelect: document.querySelector("#active-event-select"),
-    createSampleButton: document.querySelector("#create-sample-button"),
+    hamburgerButton: document.querySelector("#hamburger-button"),
+    navMenu: document.querySelector("#nav-menu"),
     tabLinks: Array.from(document.querySelectorAll("[data-tab-target]")),
     tabSections: Array.from(document.querySelectorAll(".tab-section")),
     eventForm: document.querySelector("#event-form"),
@@ -45,21 +45,22 @@ function bindEvents() {
     els.tabLinks.forEach(link => {
         link.addEventListener("click", () => {
             const target = link.dataset.tabTarget;
-            if (target) {
-                ui.activeTab = target;
-                renderTabs();
-                document.querySelector(`#tab-${target}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+            if (!target) {
+                return;
             }
+
+            ui.activeTab = target;
+            ui.menuOpen = false;
+            renderTabs();
+            document.querySelector(`#tab-${target}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
         });
     });
 
-    els.activeEventSelect.addEventListener("change", () => {
-        ui.selectedEventId = els.activeEventSelect.value || null;
-        resetReveal();
-        render();
+    els.hamburgerButton?.addEventListener("click", () => {
+        ui.menuOpen = !ui.menuOpen;
+        renderTabs();
     });
 
-    els.createSampleButton.addEventListener("click", createEmptyEvent);
     els.eventForm.addEventListener("submit", handleSaveEvent);
     els.participantForm.addEventListener("submit", handleAddParticipant);
     els.drawButton.addEventListener("click", handleDraw);
@@ -72,13 +73,15 @@ function loadState() {
     try {
         const raw = window.localStorage.getItem(STORAGE_KEY);
         if (!raw) {
-            return { events: [] };
+            return { event: null };
         }
 
         const parsed = JSON.parse(raw);
-        return { events: Array.isArray(parsed.events) ? parsed.events : [] };
+        return {
+            event: parsed?.event ?? null
+        };
     } catch {
-        return { events: [] };
+        return { event: null };
     }
 }
 
@@ -111,9 +114,8 @@ function commitState(message, type = "success") {
 function render() {
     renderTabs();
     renderStats();
-    renderEventPicker();
     renderEventForm();
-    renderEventList();
+    renderEventCard();
     renderParticipantSection();
     renderDrawSection();
 }
@@ -126,82 +128,65 @@ function renderTabs() {
     els.tabSections.forEach(section => {
         section.classList.toggle("active", section.id === `tab-${ui.activeTab}`);
     });
+
+    if (els.navMenu) {
+        els.navMenu.classList.toggle("open", ui.menuOpen);
+    }
+
+    if (els.hamburgerButton) {
+        els.hamburgerButton.setAttribute("aria-expanded", String(ui.menuOpen));
+        els.hamburgerButton.classList.toggle("open", ui.menuOpen);
+    }
 }
 
 function renderStats() {
-    const participantCount = state.events.reduce((total, event) => total + event.participants.length, 0);
-    const drawnCount = state.events.filter(event => event.assignments.length > 0).length;
-    els.statsEvents.textContent = String(state.events.length);
+    const participantCount = state.event?.participants.length ?? 0;
+    const drawnCount = state.event?.assignments.length ? 1 : 0;
+    els.statsEvents.textContent = state.event ? "1" : "0";
     els.statsParticipants.textContent = String(participantCount);
     els.statsDrawn.textContent = String(drawnCount);
 }
 
-function renderEventPicker() {
-    els.activeEventSelect.innerHTML = "";
-
-    if (state.events.length === 0) {
-        els.activeEventSelect.innerHTML = `<option value="">請先建立活動</option>`;
-        return;
-    }
-
-    state.events.forEach(event => {
-        const option = document.createElement("option");
-        option.value = event.id;
-        option.textContent = event.name;
-        els.activeEventSelect.appendChild(option);
-    });
-
-    if (!ui.selectedEventId || !state.events.some(event => event.id === ui.selectedEventId)) {
-        ui.selectedEventId = state.events[0].id;
-    }
-
-    els.activeEventSelect.value = ui.selectedEventId;
-}
-
 function renderEventForm() {
-    const event = getSelectedEvent();
-
+    const event = getEvent();
     if (!event) {
         els.eventForm.reset();
         return;
     }
 
-    els.eventForm.elements.name.value = event.name;
+    els.eventForm.elements.name.value = event.name || "";
     els.eventForm.elements.description.value = event.description || "";
     els.eventForm.elements.eventDate.value = event.eventDate || "";
     els.eventForm.elements.location.value = event.location || "";
     els.eventForm.elements.budget.value = event.budget || "";
 }
 
-function renderEventList() {
+function renderEventCard() {
     els.eventList.innerHTML = "";
-    const hasEvents = state.events.length > 0;
-    els.eventEmpty.classList.toggle("hidden", hasEvents);
+    const event = getEvent();
+    const hasEvent = Boolean(event);
+    els.eventEmpty.classList.toggle("hidden", hasEvent);
 
-    state.events.forEach(event => {
-        const fragment = els.eventCardTemplate.content.cloneNode(true);
-        fragment.querySelector(".badge").textContent = event.assignments.length > 0 ? "已完成抽籤" : "尚未抽籤";
-        fragment.querySelector(".event-date").textContent = event.eventDate ? formatDate(event.eventDate) : "未設定日期";
-        fragment.querySelector(".event-name").textContent = event.name;
-        fragment.querySelector(".event-description").textContent = event.description || "尚未填寫活動描述。";
+    if (!event) {
+        return;
+    }
 
-        const meta = fragment.querySelector(".event-meta");
-        meta.appendChild(createMetaItem("地點", event.location || "未設定"));
-        meta.appendChild(createMetaItem("預算", event.budget ? `NT$ ${Number(event.budget).toLocaleString("zh-TW")}` : "未設定"));
-        meta.appendChild(createMetaItem("人數", `${event.participants.length} 位`));
+    const fragment = els.eventCardTemplate.content.cloneNode(true);
+    fragment.querySelector(".badge").textContent = event.assignments.length > 0 ? "已完成抽獎" : "尚未抽獎";
+    fragment.querySelector(".event-date").textContent = event.eventDate ? formatDate(event.eventDate) : "未設定日期";
+    fragment.querySelector(".event-name").textContent = event.name;
+    fragment.querySelector(".event-description").textContent = event.description || "尚未填寫活動描述。";
 
-        fragment.querySelector(".select-event").addEventListener("click", () => {
-            ui.selectedEventId = event.id;
-            render();
-            flash(`已切換到活動「${event.name}」。`);
-        });
+    const meta = fragment.querySelector(".event-meta");
+    meta.appendChild(createMetaItem("地點", event.location || "未設定"));
+    meta.appendChild(createMetaItem("預算", event.budget ? `NT$ ${Number(event.budget).toLocaleString("zh-TW")}` : "未設定"));
+    meta.appendChild(createMetaItem("人數", `${event.participants.length} 位`));
 
-        els.eventList.appendChild(fragment);
-    });
+    els.eventList.appendChild(fragment);
 }
 
 function renderParticipantSection() {
-    const event = getSelectedEvent();
+    const event = getEvent();
     els.participantList.innerHTML = "";
 
     if (!event) {
@@ -220,7 +205,7 @@ function renderParticipantSection() {
             fragment.querySelector(".participant-name").textContent = participant.name;
             fragment.querySelector(".delete-participant").addEventListener("click", () => {
                 if (event.assignments.length > 0) {
-                    flash("此活動已經抽籤，請先重抽後再刪除參與者。", "error");
+                    flash("此活動已經抽獎，請先重抽後再刪除參與者。", "error");
                     return;
                 }
 
@@ -232,7 +217,7 @@ function renderParticipantSection() {
 }
 
 function renderDrawSection() {
-    const event = getSelectedEvent();
+    const event = getEvent();
     els.detailSummary.innerHTML = "";
     els.revealList.innerHTML = "";
 
@@ -250,7 +235,7 @@ function renderDrawSection() {
         ["活動地點", event.location || "未設定"],
         ["預算", event.budget ? `NT$ ${Number(event.budget).toLocaleString("zh-TW")}` : "未設定"],
         ["參與人數", `${event.participants.length} 位`],
-        ["抽籤狀態", event.assignments.length > 0 ? "已完成抽籤" : "等待抽籤"]
+        ["抽獎狀態", event.assignments.length > 0 ? "已完成抽獎" : "等待抽獎"]
     ].forEach(([label, value]) => {
         els.detailSummary.appendChild(createMetaItem(label, value));
     });
@@ -268,6 +253,13 @@ function renderDrawSection() {
     event.participants.forEach(participant => {
         const fragment = els.revealCardTemplate.content.cloneNode(true);
         fragment.querySelector(".participant-name").textContent = participant.name;
+        const matchText = fragment.querySelector(".participant-match");
+        const receiverName = getRevealedReceiverName(event, participant.id);
+        if (receiverName) {
+            matchText.classList.remove("hidden");
+            matchText.textContent = `已記錄：${participant.name} 抽到 ${receiverName}`;
+        }
+
         fragment.querySelector(".prepare-reveal").addEventListener("click", () => {
             ui.pendingReveal = participant.id;
             els.giftBoxButton.disabled = false;
@@ -275,27 +267,11 @@ function renderDrawSection() {
             els.revealResult.classList.add("hidden");
             els.rollingNames.textContent = "禮物盒準備中";
             els.revealStatus.textContent = `已選擇 ${participant.name}，按下禮物盒開始揭曉。`;
-            flash(`準備揭曉 ${participant.name} 的抽籤結果。`);
+            flash(`準備揭曉 ${participant.name} 的抽獎結果。`);
         });
+
         els.revealList.appendChild(fragment);
     });
-}
-
-function createEmptyEvent() {
-    const newEvent = {
-        id: crypto.randomUUID(),
-        name: "新的交換禮物活動",
-        description: "",
-        eventDate: "",
-        location: "",
-        budget: "",
-        participants: [],
-        assignments: []
-    };
-
-    state.events.unshift(newEvent);
-    ui.selectedEventId = newEvent.id;
-    commitState("已建立新的空白活動。");
 }
 
 function handleSaveEvent(event) {
@@ -308,36 +284,27 @@ function handleSaveEvent(event) {
         return;
     }
 
-    let current = getSelectedEvent();
-    if (!current) {
-        current = {
-            id: crypto.randomUUID(),
-            participants: [],
-            assignments: []
-        };
-        state.events.unshift(current);
-        ui.selectedEventId = current.id;
-    }
-
+    const current = getEvent() ?? createEventShell();
     current.name = name;
     current.description = String(formData.get("description") || "").trim();
     current.eventDate = String(formData.get("eventDate") || "");
     current.location = String(formData.get("location") || "").trim();
     current.budget = String(formData.get("budget") || "").trim();
 
+    state.event = current;
     commitState(`活動「${current.name}」已儲存。`);
 }
 
 function handleAddParticipant(event) {
     event.preventDefault();
-    const current = getSelectedEvent();
+    const current = getEvent();
     if (!current) {
         flash("請先建立活動。", "error");
         return;
     }
 
     if (current.assignments.length > 0) {
-        flash("此活動已抽籤，請先重抽後再新增參與者。", "error");
+        flash("此活動已抽獎，請先重抽後再新增參與者。", "error");
         return;
     }
 
@@ -358,24 +325,22 @@ function handleAddParticipant(event) {
 }
 
 function handleDraw() {
-    const current = getSelectedEvent();
+    const current = getEvent();
     if (!current) {
         flash("請先建立活動。", "error");
         return;
     }
 
     if (current.participants.length < 2) {
-        flash("至少需要 2 位參與者才能抽籤。", "error");
+        flash("至少需要 2 位參與者才能抽獎。", "error");
         return;
     }
 
-    current.assignments = generateAssignments(current.participants);
-    resetReveal();
-    commitState(`活動「${current.name}」已完成公平抽籤。`);
+    showDrawOverlay(current);
 }
 
 function handleResetDraw() {
-    const current = getSelectedEvent();
+    const current = getEvent();
     if (!current || current.assignments.length === 0) {
         flash("目前沒有可重抽的結果。", "error");
         return;
@@ -386,12 +351,13 @@ function handleResetDraw() {
     }
 
     current.assignments = [];
+    current.revealedResults = {};
     resetReveal();
-    commitState("抽籤結果已清除，可以重新抽籤。");
+    commitState("抽獎結果已清除，可以重新抽獎。");
 }
 
 function handleDeleteEvent() {
-    const current = getSelectedEvent();
+    const current = getEvent();
     if (!current) {
         flash("目前沒有可刪除的活動。", "error");
         return;
@@ -401,14 +367,13 @@ function handleDeleteEvent() {
         return;
     }
 
-    state.events = state.events.filter(item => item.id !== current.id);
-    ui.selectedEventId = state.events[0]?.id ?? null;
+    state.event = null;
     resetReveal();
     commitState(`活動「${current.name}」已刪除。`);
 }
 
 function handleGiftReveal() {
-    const current = getSelectedEvent();
+    const current = getEvent();
     if (!current || !ui.pendingReveal) {
         return;
     }
@@ -418,7 +383,7 @@ function handleGiftReveal() {
     const receiver = current.participants.find(item => item.id === assignment?.receiverId);
 
     if (!giver || !receiver) {
-        flash("找不到揭曉資料，請重新抽籤。", "error");
+        flash("找不到揭曉資料，請重新抽獎。", "error");
         return;
     }
 
@@ -437,10 +402,51 @@ function handleGiftReveal() {
             els.rollingNames.textContent = receiver.name;
             els.revealName.textContent = `${giver.name} 抽到的是 ${receiver.name}`;
             els.revealResult.classList.remove("hidden");
-            els.revealStatus.textContent = "揭曉完成，換下一位時記得先把畫面收起來。";
+            els.revealStatus.textContent = "揭曉完成，這筆結果已記錄在下方卡片。";
+            current.revealedResults[giver.id] = receiver.id;
+            saveState();
+            renderDrawSection();
             playBellSound();
         }
     }, 120);
+}
+
+function showDrawOverlay(current) {
+    const backdrop = document.createElement("div");
+    backdrop.className = "draw-backdrop";
+    backdrop.innerHTML = `
+        <div class="draw-overlay-card">
+            <span class="pill">Gift Draw</span>
+            <h2>聖誕精靈正在交換禮物</h2>
+            <p>5 秒後自動完成抽獎，請把驚喜留到揭曉時刻。</p>
+            <div class="draw-gift-row">
+                <div class="draw-mini-gift draw-mini-gift-red"></div>
+                <div class="draw-mini-gift draw-mini-gift-gold"></div>
+                <div class="draw-mini-gift draw-mini-gift-green"></div>
+            </div>
+            <div class="draw-countdown" id="draw-countdown">5</div>
+        </div>
+    `;
+    document.body.appendChild(backdrop);
+
+    let seconds = 5;
+    const countdown = backdrop.querySelector("#draw-countdown");
+    const tick = () => {
+        seconds -= 1;
+        countdown.textContent = String(Math.max(seconds, 0));
+        if (seconds > 0) {
+            window.setTimeout(tick, 1000);
+            return;
+        }
+
+        current.assignments = generateAssignments(current.participants);
+        current.revealedResults = {};
+        resetReveal();
+        backdrop.remove();
+        commitState(`活動「${current.name}」已完成抽獎。`);
+    };
+
+    window.setTimeout(tick, 1000);
 }
 
 function resetReveal() {
@@ -452,8 +458,31 @@ function resetReveal() {
     els.revealResult.classList.add("hidden");
 }
 
-function getSelectedEvent() {
-    return state.events.find(item => item.id === ui.selectedEventId) ?? null;
+function getEvent() {
+    return state.event;
+}
+
+function createEventShell() {
+    return {
+        id: crypto.randomUUID(),
+        name: "",
+        description: "",
+        eventDate: "",
+        location: "",
+        budget: "",
+        participants: [],
+        assignments: [],
+        revealedResults: {}
+    };
+}
+
+function getRevealedReceiverName(event, giverId) {
+    const receiverId = event.revealedResults?.[giverId];
+    if (!receiverId) {
+        return "";
+    }
+
+    return event.participants.find(item => item.id === receiverId)?.name || "";
 }
 
 function generateAssignments(participants) {
@@ -473,7 +502,7 @@ function generateAssignments(participants) {
         attempts += 1;
     }
 
-    throw new Error("無法產生有效抽籤結果。");
+    throw new Error("無法產生有效抽獎結果。");
 }
 
 function shuffle(items) {
