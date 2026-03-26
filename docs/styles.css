@@ -401,6 +401,19 @@ button, input, textarea, select { font: inherit; }
     color: var(--text-mid);
 }
 
+.panel-card .pill,
+.event-card .pill,
+.participant-card .pill {
+    color: #7a6928;
+}
+
+.panel-card p,
+.event-card p,
+.participant-card p,
+.empty-state p {
+    color: var(--muted);
+}
+
 .form-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -416,6 +429,12 @@ button, input, textarea, select { font: inherit; }
     gap: 0.45rem;
     color: var(--text-soft);
     font-weight: 700;
+}
+
+.panel-card .form-grid label,
+.event-card .form-grid label,
+.participant-card .form-grid label {
+    color: #5d615c;
 }
 
 .form-grid input,
@@ -470,6 +489,14 @@ button, input, textarea, select { font: inherit; }
     color: var(--text-soft);
     border: 1px solid rgba(255, 255, 255, 0.42);
     background: rgba(255, 255, 255, 0.04);
+}
+
+.event-card .btn-ghost,
+.panel-card .btn-ghost,
+.participant-card .btn-ghost {
+    color: #5a5f59;
+    border-color: rgba(31, 41, 36, 0.16);
+    background: rgba(31, 41, 36, 0.02);
 }
 
 .btn-danger {
@@ -654,12 +681,17 @@ button, input, textarea, select { font: inherit; }
     font-weight: 800;
 }
 
+.panel-card .reveal-status,
+.reveal-card .reveal-status {
+    color: #63665f;
+}
+
 .rolling-names {
     min-height: 3rem;
     display: grid;
     place-items: center;
     font-size: 1.5rem;
-    color: var(--ink);
+    color: #3d423d;
     font-weight: 900;
 }
 
