@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>聖誕節交換禮物抽籤網站</title>
-    <meta name="description" content="GitHub Pages 版聖誕節交換禮物抽籤網站，使用 localStorage 保存活動與抽籤結果。">
+    <title>聖誕交換禮物抽籤</title>
+    <meta name="description" content="GitHub Pages 版聖誕交換禮物抽籤網站，採用同一支手機完成活動設定、名單管理、抽獎與逐一揭曉。">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
@@ -33,14 +33,14 @@
                     <img src="https://img.lovepik.com/png/20231106/christmas-beautiful-christmas-tree-illustration-Christmas-theme-beauty-galas_512700_wh860.png" alt="聖誕樹">
                 </span>
                 <span class="brand-copy">
-                    <strong>交換禮物抽籤網站</strong>
-                    <small>Christmas Gift Exchange</small>
+                    <strong>聖誕交換禮物抽籤</strong>
+                    <small>Christmas Gift Draw</small>
                 </span>
             </a>
             <nav class="nav-links">
-                <a href="#create">建立活動</a>
-                <a href="#events">活動管理</a>
-                <a href="#reveal">揭曉結果</a>
+                <button class="tab-link active" type="button" data-tab-target="settings">活動設定</button>
+                <button class="tab-link" type="button" data-tab-target="participants">名單管理</button>
+                <button class="tab-link" type="button" data-tab-target="draw">抽獎 / 結果</button>
             </nav>
         </div>
     </header>
@@ -49,16 +49,16 @@
         <section class="hero">
             <div class="container hero-grid">
                 <div class="hero-copy">
-                    <span class="pill">GitHub Pages Edition</span>
-                    <h1>免費部署版聖誕交換禮物抽籤</h1>
-                    <p>這一版完全改成純前端網站，資料會存進你的瀏覽器 localStorage。可以建立活動、加入參與者、抽籤、重抽，還能用通關碼各自揭曉。</p>
+                    <span class="pill">Mobile First Pages Edition</span>
+                    <h1>聖誕交換禮物抽籤</h1>
+                    <p>可以建立活動、加入參與者、抽籤、重抽，還能用通關碼各自揭曉。</p>
                     <div class="hero-actions">
-                        <a class="btn btn-gold" href="#create">立即建立活動</a>
-                        <a class="btn btn-ghost" href="#reveal">前往揭曉頁</a>
+                        <button class="btn btn-gold" type="button" data-tab-target="settings">開始建立活動</button>
+                        <button class="btn btn-ghost" type="button" data-tab-target="draw">前往抽獎結果</button>
                     </div>
                     <div class="hero-tip">
-                        <strong>提醒</strong>
-                        <span>資料只會存在你目前這台裝置的瀏覽器裡，換電腦或清除瀏覽器資料就會消失。</span>
+                        <strong>同一支手機完成</strong>
+                        <span>所有操作都在同一裝置進行，資料會暫存在目前瀏覽器的 localStorage 中。</span>
                     </div>
                 </div>
                 <div class="hero-scene">
@@ -87,166 +87,152 @@
                 <strong id="stats-participants">0</strong>
             </article>
             <article class="stat-card">
-                <span>已完成抽籤</span>
+                <span>已抽籤活動</span>
                 <strong id="stats-drawn">0</strong>
             </article>
         </section>
 
         <div class="container flash-stack" id="flash-stack" aria-live="polite"></div>
 
-        <section class="container section-shell" id="create">
-            <div class="section-header">
-                <div>
-                    <span class="pill">Create Event</span>
-                    <h2>建立交換禮物活動</h2>
-                    <p>建立一個活動後，就能加入參與者並進行公平抽籤。</p>
-                </div>
-            </div>
-            <form id="event-form" class="form-grid">
-                <label>
-                    <span>活動名稱</span>
-                    <input type="text" name="name" placeholder="例如：公司聖誕交換禮物" required>
-                </label>
-                <label>
-                    <span>活動日期</span>
-                    <input type="datetime-local" name="eventDate" required>
-                </label>
-                <label class="wide">
-                    <span>活動描述</span>
-                    <textarea name="description" rows="3" placeholder="寫下活動主題、dress code 或玩法"></textarea>
-                </label>
-                <label>
-                    <span>活動地點</span>
-                    <input type="text" name="location" placeholder="例如：會議室 / 餐廳 / 線上">
-                </label>
-                <label>
-                    <span>報名截止</span>
-                    <input type="datetime-local" name="registrationDeadline" required>
-                </label>
-                <label>
-                    <span>預算金額</span>
-                    <input type="number" name="budget" min="0" step="1" placeholder="1000" required>
-                </label>
-                <div class="wide form-actions">
-                    <button type="submit" class="btn btn-gold">建立活動</button>
-                    <button type="reset" class="btn btn-muted">清空</button>
-                </div>
-            </form>
-        </section>
+        <div class="container event-toolbar">
+            <label class="event-picker">
+                <span>目前活動</span>
+                <select id="active-event-select"></select>
+            </label>
+            <button id="create-sample-button" class="btn btn-ghost" type="button">建立空白活動</button>
+        </div>
 
-        <section class="container section-shell" id="events">
-            <div class="section-header">
-                <div>
-                    <span class="pill">Event Hub</span>
-                    <h2>活動管理</h2>
-                    <p>選擇一個活動來加入參與者、刪除資料、抽籤或重抽。</p>
-                </div>
-            </div>
-            <div id="event-list" class="event-grid"></div>
-            <div id="event-empty" class="empty-state">
-                <h3>目前還沒有任何活動</h3>
-                <p>先建立第一個活動，接著就能加入參與者並開始抽籤。</p>
-            </div>
-        </section>
-
-        <section class="container detail-shell hidden" id="event-detail-section">
-            <div class="section-header">
-                <div>
-                    <span class="pill">Event Detail</span>
-                    <h2 id="detail-name">活動詳情</h2>
-                    <p id="detail-description">管理參與者、執行抽籤，並查看每位參與者的專屬通關碼。</p>
-                </div>
-                <div class="detail-actions">
-                    <button id="draw-button" class="btn btn-gold">開始公平抽籤</button>
-                    <button id="reset-draw-button" class="btn btn-ghost">重抽</button>
-                    <button id="delete-event-button" class="btn btn-danger">刪除活動</button>
-                </div>
-            </div>
-
-            <div class="detail-grid">
-                <article class="panel-card">
-                    <h3>活動資訊</h3>
-                    <dl class="summary-list" id="detail-summary"></dl>
-                </article>
-
-                <article class="panel-card">
-                    <h3>新增參與者</h3>
-                    <p>每位參與者都會產生自己的通關碼，用來在揭曉頁查看抽到的人。</p>
-                    <form id="participant-form" class="form-grid compact">
-                        <label>
-                            <span>姓名</span>
-                            <input type="text" name="name" required>
-                        </label>
-                        <label>
-                            <span>Email（選填）</span>
-                            <input type="email" name="email">
-                        </label>
-                        <label class="wide">
-                            <span>小提示（選填）</span>
-                            <textarea name="wishlistHint" rows="3" placeholder="例如：喜歡巧克力、不喝咖啡、想要暖暖包"></textarea>
-                        </label>
-                        <div class="wide form-actions">
-                            <button type="submit" class="btn btn-christmas">加入參與者</button>
-                        </div>
-                    </form>
-                </article>
-            </div>
-
-            <article class="panel-card">
+        <section class="container tab-section active" id="tab-settings">
+            <div class="section-shell">
                 <div class="section-header">
                     <div>
-                        <h3>參與者與通關碼</h3>
-                        <p>抽籤後每個人只要知道自己的通關碼，就能單獨揭曉結果。</p>
+                        <span class="pill">Page 1</span>
+                        <h2>活動設定頁</h2>
+                        <p>建立活動、切換活動與刪除活動都在這裡完成。</p>
                     </div>
                 </div>
-                <div id="participant-list" class="participant-grid"></div>
-                <div id="participant-empty" class="empty-state compact">
-                    <h3>還沒有參與者</h3>
-                    <p>至少需要 2 位參與者才能抽籤。</p>
-                </div>
-            </article>
-        </section>
 
-        <section class="container section-shell" id="reveal">
-            <div class="section-header">
-                <div>
-                    <span class="pill">Reveal Portal</span>
-                    <h2>個人揭曉頁</h2>
-                    <p>輸入自己的名字與通關碼，只會看到自己抽到的那一位。</p>
+                <div class="detail-grid">
+                    <article class="panel-card">
+                        <h3>建立 / 編輯活動</h3>
+                        <form id="event-form" class="form-grid compact">
+                            <label class="wide">
+                                <span>活動名稱（必填）</span>
+                                <input type="text" name="name" placeholder="例如：聖誕禮物交換" required>
+                            </label>
+                            <label class="wide">
+                                <span>活動描述（選填）</span>
+                                <textarea name="description" rows="3" placeholder="例如：用抽到的名字去準備禮物"></textarea>
+                            </label>
+                            <label>
+                                <span>活動日期（選填）</span>
+                                <input type="datetime-local" name="eventDate">
+                            </label>
+                            <label>
+                                <span>活動地點（選填）</span>
+                                <input type="text" name="location" placeholder="例如：家裡 / 公司">
+                            </label>
+                            <label class="wide">
+                                <span>預算金額（選填）</span>
+                                <input type="number" name="budget" min="0" step="1" placeholder="1000">
+                            </label>
+                            <div class="wide form-actions">
+                                <button type="submit" class="btn btn-gold">儲存活動</button>
+                                <button type="button" class="btn btn-danger" id="delete-event-button">刪除活動</button>
+                            </div>
+                        </form>
+                    </article>
+
+                    <article class="panel-card">
+                        <h3>活動列表</h3>
+                        <p>點選任一活動，就能在下方分頁管理名單與抽獎。</p>
+                        <div id="event-list" class="event-grid single-column"></div>
+                        <div id="event-empty" class="empty-state compact">
+                            <h3>還沒有活動</h3>
+                            <p>先建立第一個活動，就可以開始輸入名單。</p>
+                        </div>
+                    </article>
                 </div>
             </div>
+        </section>
 
-            <div class="detail-grid">
-                <article class="panel-card">
-                    <form id="reveal-form" class="form-grid compact">
-                        <label class="wide">
-                            <span>活動</span>
-                            <select id="reveal-event-select" required></select>
-                        </label>
-                        <label>
-                            <span>我是誰</span>
-                            <select id="reveal-participant-select" required></select>
-                        </label>
-                        <label>
-                            <span>專屬通關碼</span>
-                            <input id="reveal-access-code" type="text" placeholder="例如：5A81C2F0" required>
-                        </label>
-                        <div class="wide form-actions">
-                            <button type="submit" class="btn btn-gold">準備揭曉</button>
+        <section class="container tab-section" id="tab-participants">
+            <div class="section-shell">
+                <div class="section-header">
+                    <div>
+                        <span class="pill">Page 2</span>
+                        <h2>名單管理頁</h2>
+                        <p>每位參與者只需要輸入名字，不需要 Email，也不需要驗證碼。</p>
+                    </div>
+                </div>
+
+                <div class="detail-grid">
+                    <article class="panel-card">
+                        <h3>新增參與者</h3>
+                        <form id="participant-form" class="form-grid compact">
+                            <label class="wide">
+                                <span>名稱（必填）</span>
+                                <input type="text" name="name" placeholder="例如：小美" required>
+                            </label>
+                            <div class="wide form-actions">
+                                <button type="submit" class="btn btn-christmas">加入參與者</button>
+                            </div>
+                        </form>
+                    </article>
+
+                    <article class="panel-card">
+                        <h3>目前名單</h3>
+                        <p>抽籤前都可以新增或刪除。抽籤後若要調整，先按重抽即可。</p>
+                        <div id="participant-list" class="participant-grid"></div>
+                        <div id="participant-empty" class="empty-state compact">
+                            <h3>尚未加入任何參與者</h3>
+                            <p>至少需要 2 位參與者才能抽籤。</p>
                         </div>
-                    </form>
-                </article>
+                    </article>
+                </div>
+            </div>
+        </section>
 
-                <article class="panel-card reveal-card">
-                    <button id="gift-box-button" class="gift-box-button" type="button" disabled aria-label="拆開禮物盒">
-                        <span class="gift-box-visual"></span>
-                    </button>
-                    <p id="reveal-status" class="reveal-status">先完成名字與通關碼驗證，才能拆開禮物盒。</p>
-                    <div id="rolling-names" class="rolling-names">等待揭曉</div>
-                    <div id="reveal-result" class="reveal-result hidden">
-                        <span class="pill">Your Match</span>
-                        <h3 id="reveal-name">你抽到的是</h3>
-                        <p id="reveal-hint" class="hint-text"></p>
+        <section class="container tab-section" id="tab-draw">
+            <div class="section-shell">
+                <div class="section-header">
+                    <div>
+                        <span class="pill">Page 3</span>
+                        <h2>抽獎 / 結果頁</h2>
+                        <p>一鍵抽出全部結果。揭曉前不會先顯示抽到誰，必須逐一點擊參與者才會看到。</p>
+                    </div>
+                    <div class="detail-actions">
+                        <button id="draw-button" class="btn btn-gold" type="button">開始公平抽籤</button>
+                        <button id="reset-draw-button" class="btn btn-ghost" type="button">重抽</button>
+                    </div>
+                </div>
+
+                <div class="detail-grid">
+                    <article class="panel-card">
+                        <h3>活動資訊</h3>
+                        <dl id="detail-summary" class="summary-list"></dl>
+                    </article>
+
+                    <article class="panel-card reveal-card">
+                        <button id="gift-box-button" class="gift-box-button" type="button" disabled aria-label="拆開禮物盒">
+                            <span class="gift-box-visual"></span>
+                        </button>
+                        <p id="reveal-status" class="reveal-status">先點擊下方某位參與者，再拆開禮物盒揭曉。</p>
+                        <div id="rolling-names" class="rolling-names">等待揭曉</div>
+                        <div id="reveal-result" class="reveal-result hidden">
+                            <span class="pill">Reveal</span>
+                            <h3 id="reveal-name">等待揭曉</h3>
+                        </div>
+                    </article>
+                </div>
+
+                <article class="panel-card">
+                    <h3>逐一揭曉</h3>
+                    <p>點擊某位參與者，畫面才會準備顯示他抽到的對象，避免其他人先看到全部配對。</p>
+                    <div id="reveal-list" class="participant-grid"></div>
+                    <div id="reveal-empty" class="empty-state compact">
+                        <h3>尚未抽籤</h3>
+                        <p>請先建立名單並按下「開始公平抽籤」。</p>
                     </div>
                 </article>
             </div>
@@ -263,8 +249,7 @@
             <p class="event-description"></p>
             <dl class="event-meta"></dl>
             <div class="event-actions">
-                <button class="btn btn-christmas select-event" type="button">管理活動</button>
-                <button class="btn btn-ghost open-reveal" type="button">前往揭曉</button>
+                <button class="btn btn-christmas select-event" type="button">切換活動</button>
             </div>
         </article>
     </template>
@@ -275,10 +260,14 @@
                 <h4 class="participant-name"></h4>
                 <button class="icon-button delete-participant" type="button" aria-label="刪除參與者">×</button>
             </div>
-            <p class="participant-email"></p>
-            <p class="participant-hint"></p>
-            <p class="participant-code"></p>
-            <p class="participant-match hidden"></p>
+        </article>
+    </template>
+
+    <template id="reveal-card-template">
+        <article class="participant-card reveal-person-card">
+            <h4 class="participant-name"></h4>
+            <p class="participant-hint">點擊這張卡片，準備揭曉這位參與者抽到的人。</p>
+            <button class="btn btn-christmas prepare-reveal" type="button">選擇這位參與者</button>
         </article>
     </template>
 

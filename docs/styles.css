@@ -107,14 +107,20 @@ button, input, textarea, select { font: inherit; }
     align-items: center;
 }
 
-.nav-links a {
+.nav-links a,
+.tab-link {
     padding: 0.8rem 1rem;
     border-radius: 999px;
     font-weight: 700;
     color: var(--text-soft);
+    border: 0;
+    background: transparent;
+    cursor: pointer;
 }
 
-.nav-links a:hover {
+.nav-links a:hover,
+.tab-link:hover,
+.tab-link.active {
     background: rgba(255, 255, 255, 0.08);
 }
 
@@ -394,6 +400,39 @@ button, input, textarea, select { font: inherit; }
     margin-bottom: 1.4rem;
 }
 
+.tab-section {
+    display: none;
+}
+
+.tab-section.active {
+    display: block;
+}
+
+.event-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.event-picker {
+    display: grid;
+    gap: 0.45rem;
+    min-width: min(380px, 100%);
+    color: var(--text-soft);
+    font-weight: 700;
+}
+
+.event-picker select {
+    width: 100%;
+    padding: 0.95rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 18px;
+    color: var(--ink);
+    background: rgba(255, 250, 241, 0.96);
+}
+
 .section-header p,
 .panel-card p,
 .event-card p,
@@ -516,6 +555,10 @@ button, input, textarea, select { font: inherit; }
     gap: 1.25rem;
 }
 
+.single-column {
+    grid-template-columns: 1fr;
+}
+
 .event-card,
 .panel-card,
 .participant-card,
@@ -589,6 +632,10 @@ button, input, textarea, select { font: inherit; }
 .participant-card {
     display: grid;
     gap: 0.55rem;
+}
+
+.reveal-person-card {
+    text-align: left;
 }
 
 .participant-code,
@@ -750,6 +797,7 @@ button, input, textarea, select { font: inherit; }
 
     .topbar-inner,
     .nav-links,
+    .event-toolbar,
     .section-header,
     .hero-actions,
     .detail-actions,
