@@ -9,6 +9,9 @@
     --cream-deep: #f2e8d7;
     --ink: #1f2924;
     --muted: rgba(31, 41, 36, 0.72);
+    --text-soft: #d4d1c9;
+    --text-mid: #c1beb5;
+    --text-deep: #aba79d;
     --line: rgba(255, 255, 255, 0.12);
     --shadow: 0 26px 60px rgba(0, 0, 0, 0.2);
     --radius: 28px;
@@ -19,7 +22,7 @@ html { scroll-behavior: smooth; }
 body {
     margin: 0;
     min-height: 100vh;
-    color: var(--cream);
+    color: var(--text-soft);
     font-family: "Noto Sans TC", sans-serif;
     background:
         radial-gradient(circle at 10% 0%, rgba(255, 236, 164, 0.18), transparent 18%),
@@ -93,7 +96,7 @@ button, input, textarea, select { font: inherit; }
 }
 
 .brand-copy small {
-    color: rgba(255, 249, 239, 0.72);
+    color: var(--text-mid);
     text-transform: uppercase;
     letter-spacing: 0.08em;
 }
@@ -108,7 +111,7 @@ button, input, textarea, select { font: inherit; }
     padding: 0.8rem 1rem;
     border-radius: 999px;
     font-weight: 700;
-    color: rgba(255, 249, 239, 0.88);
+    color: var(--text-soft);
 }
 
 .nav-links a:hover {
@@ -174,7 +177,7 @@ button, input, textarea, select { font: inherit; }
 .panel-card p,
 .empty-state p {
     margin: 0;
-    color: rgba(255, 249, 239, 0.88);
+    color: var(--text-soft);
     line-height: 1.8;
 }
 
@@ -221,6 +224,10 @@ button, input, textarea, select { font: inherit; }
 
 .hero-tip strong {
     color: var(--gold-soft);
+}
+
+.hero-tip span {
+    color: var(--text-mid);
 }
 
 .hero-scene {
@@ -391,7 +398,7 @@ button, input, textarea, select { font: inherit; }
 .panel-card p,
 .event-card p,
 .hint-text {
-    color: rgba(255, 249, 239, 0.8);
+    color: var(--text-mid);
 }
 
 .form-grid {
@@ -407,7 +414,7 @@ button, input, textarea, select { font: inherit; }
 .form-grid label {
     display: grid;
     gap: 0.45rem;
-    color: var(--cream);
+    color: var(--text-soft);
     font-weight: 700;
 }
 
@@ -448,25 +455,25 @@ button, input, textarea, select { font: inherit; }
 }
 
 .btn-gold {
-    color: white;
+    color: #4f3b10;
     background: linear-gradient(180deg, #efcf72, #cf9a22);
     box-shadow: 0 14px 28px rgba(207, 154, 34, 0.3);
 }
 
 .btn-christmas {
-    color: white;
+    color: var(--text-soft);
     background: linear-gradient(180deg, #cc3449, #941b2c);
     box-shadow: 0 14px 28px rgba(148, 27, 44, 0.28);
 }
 
 .btn-ghost {
-    color: var(--cream);
+    color: var(--text-soft);
     border: 1px solid rgba(255, 255, 255, 0.42);
     background: rgba(255, 255, 255, 0.04);
 }
 
 .btn-danger {
-    color: white;
+    color: var(--text-soft);
     background: linear-gradient(180deg, #97505b, #642a34);
 }
 
