@@ -1,0 +1,127 @@
+@model ChristmasGiftExchange.ViewModels.HomeDashboardViewModel
+@{
+    ViewData["Title"] = "聖誕節交換禮物抽籤網站";
+}
+
+<section class="hero-card festive-glow">
+    <div class="hero-copy">
+        <span class="hero-pill">Holiday Magic</span>
+        <h1>聖誕節交換禮物抽籤網站</h1>
+        <p>從建立活動、加入參與者，到公平抽籤與禮物揭曉，整個流程都包進一個有節慶感、真的適合拿來玩的交換禮物網站。</p>
+        <div class="hero-actions">
+            <a class="btn btn-gold" asp-controller="Events" asp-action="Create">立即建立活動</a>
+            <a class="btn btn-outline-light" asp-controller="Events" asp-action="Index">查看所有活動</a>
+        </div>
+        <div class="hero-mini-grid">
+            <div class="hero-mini-card">
+                <span class="mini-icon">🎄</span>
+                <div>
+                    <strong>節慶場景</strong>
+                    <p>雪花、燈飾、禮物與溫暖的節慶色彩。</p>
+                </div>
+            </div>
+            <div class="hero-mini-card">
+                <span class="mini-icon">🎁</span>
+                <div>
+                    <strong>驚喜揭曉</strong>
+                    <p>名字滾動、禮物盒打開與個人專屬結果頁。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="hero-visual">
+        <div class="hero-scene">
+            <div class="moon-glow"></div>
+            <div class="tree tree-left"></div>
+            <div class="tree tree-center"></div>
+            <div class="tree tree-right"></div>
+            <div class="hero-gift-stack">
+                <div class="gift gift-large"></div>
+                <div class="gift gift-small"></div>
+                <div class="gift gift-tall"></div>
+            </div>
+            <div class="snow-hill snow-hill-back"></div>
+            <div class="snow-hill snow-hill-front"></div>
+        </div>
+        <div class="hero-stats">
+            <div class="stat-card">
+                <strong>@Model.TotalEvents</strong>
+                <span>交換活動</span>
+            </div>
+            <div class="stat-card">
+                <strong>@Model.TotalParticipants</strong>
+                <span>參與者</span>
+            </div>
+            <div class="stat-card">
+                <strong>@Model.TotalDraws</strong>
+                <span>已建立配對</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-shell">
+    <div class="section-header">
+        <div>
+            <h2>近期活動</h2>
+            <p>從這裡快速進入活動管理、抽籤與揭曉頁面。</p>
+        </div>
+        <a class="btn btn-outline-light" asp-controller="Events" asp-action="Index">管理活動</a>
+    </div>
+
+    @if (Model.UpcomingEvents.Any())
+    {
+        <div class="event-grid">
+            @foreach (var item in Model.UpcomingEvents)
+            {
+                <article class="event-card">
+                    <div class="event-card-top">
+                        <span class="badge-soft">@(item.HasDrawn ? "已抽籤" : "準備中")</span>
+                        <span>@item.EventDate.ToString("yyyy/MM/dd")</span>
+                    </div>
+                    <h3>@item.Name</h3>
+                    <p>@item.Description</p>
+                    <dl class="event-meta">
+                        <div>
+                            <dt>地點</dt>
+                            <dd>@item.Location</dd>
+                        </div>
+                        <div>
+                            <dt>人數</dt>
+                            <dd>@item.ParticipantCount 位</dd>
+                        </div>
+                    </dl>
+                    <a class="btn btn-christmas" asp-controller="Events" asp-action="Details" asp-route-id="@item.Id">前往活動</a>
+                </article>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <h3>還沒有任何交換禮物活動</h3>
+            <p>先建立第一個活動，接著就能加入參與者並開始抽籤。</p>
+            <a class="btn btn-gold" asp-controller="Events" asp-action="Create">建立第一個活動</a>
+        </div>
+    }
+</section>
+
+<section class="section-shell section-shell-soft">
+    <div class="feature-strip">
+        <article class="feature-card">
+            <span class="feature-kicker">Step 1</span>
+            <h3>建立交換活動</h3>
+            <p>輸入活動名稱、日期、地點、截止時間與預算，快速開局。</p>
+        </article>
+        <article class="feature-card">
+            <span class="feature-kicker">Step 2</span>
+            <h3>加入參與者</h3>
+            <p>支援 Email 與小提示，抽到後能收到更貼心的聖誕暗示。</p>
+        </article>
+        <article class="feature-card">
+            <span class="feature-kicker">Step 3</span>
+            <h3>公平抽籤揭曉</h3>
+            <p>保證不抽到自己、每人只被抽中一次，驚喜又公平。</p>
+        </article>
+    </div>
+</section>

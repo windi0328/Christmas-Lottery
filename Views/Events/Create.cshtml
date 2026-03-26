@@ -1,0 +1,56 @@
+@model ChristmasGiftExchange.ViewModels.EventFormViewModel
+@{
+    ViewData["Title"] = "建立活動";
+}
+
+<section class="intro-card">
+    <span class="hero-pill">New Event</span>
+    <h1 class="page-title">建立新的交換禮物活動</h1>
+    <p>設定活動基本資料後，就能開始加入參與者並進行抽籤。</p>
+</section>
+
+<section class="form-shell">
+    <form asp-action="Create" method="post" class="row g-4">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="col-md-6">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Location" class="form-label"></label>
+            <input asp-for="Location" class="form-control" />
+            <span asp-validation-for="Location" class="text-danger"></span>
+        </div>
+        <div class="col-12">
+            <label asp-for="Description" class="form-label"></label>
+            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="EventDate" class="form-label"></label>
+            <input asp-for="EventDate" class="form-control" type="datetime-local" />
+            <span asp-validation-for="EventDate" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="RegistrationDeadline" class="form-label"></label>
+            <input asp-for="RegistrationDeadline" class="form-control" type="datetime-local" />
+            <span asp-validation-for="RegistrationDeadline" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Budget" class="form-label"></label>
+            <input asp-for="Budget" class="form-control" />
+            <span asp-validation-for="Budget" class="text-danger"></span>
+        </div>
+        <div class="col-12">
+            <div class="stack-actions">
+                <button type="submit" class="btn btn-christmas">儲存活動</button>
+                <a class="btn btn-outline-forest" asp-action="Index">返回活動列表</a>
+            </div>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

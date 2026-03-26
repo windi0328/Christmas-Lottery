@@ -1,0 +1,288 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - 聖誕節交換禮物抽籤網站</title>
+    <style>
+        :root {
+            --red: #b7263d;
+            --red-deep: #82192a;
+            --green: #0f4b3a;
+            --green-deep: #0a2f24;
+            --gold: #e2bb56;
+            --gold-soft: #fff0b8;
+            --cream: #fffaf1;
+            --ink: #1d241f;
+            --glass: rgba(255, 250, 241, 0.1);
+            --card: rgba(255, 250, 241, 0.95);
+            --border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+            --radius-xl: 30px;
+        }
+        html { font-size: 16px; min-height: 100%; }
+        body {
+            min-height: 100vh;
+            margin: 0;
+            color: var(--cream);
+            font-family: "Trebuchet MS","Noto Sans TC",sans-serif;
+            background:
+                radial-gradient(circle at 20% 0%, rgba(255,229,153,.14), transparent 20%),
+                radial-gradient(circle at 100% 10%, rgba(183,38,61,.16), transparent 24%),
+                linear-gradient(180deg, #15513f 0%, #0d3528 50%, #081d16 100%);
+            overflow-x: hidden;
+        }
+        a { color: inherit; text-decoration: none; }
+        .topbar,.page-shell,.footer-shell { position: relative; z-index: 2; }
+        .topbar { padding-top: 1.2rem; }
+        .page-shell { padding: 2rem 0 4rem; }
+        .nav-shell {
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+            padding: 1rem 1.3rem; background: rgba(8,26,19,.58); border: 1px solid var(--border);
+            border-radius: 999px; box-shadow: var(--shadow); backdrop-filter: blur(14px);
+        }
+        .brand-mark { display: flex; align-items: center; gap: .9rem; }
+        .brand-icon {
+            display: inline-block;
+            width: 4.4rem;
+            height: 4.4rem;
+            border-radius: 50%;
+            padding: .45rem;
+            background: radial-gradient(circle at 30% 30%, #fff3bf 0%, #f2cf64 48%, #d8a81f 100%);
+            border: 1px solid rgba(255, 240, 184, .6);
+            box-shadow: 0 14px 34px rgba(226,187,86,.35);
+            flex: 0 0 auto;
+            overflow: hidden;
+        }
+        .brand-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            border-radius: 50%;
+            background: linear-gradient(180deg, rgba(255, 245, 205, .95), rgba(248, 219, 116, .95));
+            filter: drop-shadow(0 8px 12px rgba(0, 0, 0, .18));
+        }
+        .brand-copy { display: grid; gap: .1rem; }
+        .brand-copy strong { font-size: 1.45rem; line-height: 1.1; }
+        .brand-copy small { color: rgba(255,250,241,.72); letter-spacing: .08em; text-transform: uppercase; }
+        .nav-links { display: flex; align-items: center; gap: .6rem; }
+        .nav-link { padding: .8rem 1rem; border-radius: 999px; color: rgba(255,250,241,.88); font-weight: 700; }
+        .nav-link:hover { background: rgba(255,255,255,.08); }
+        .hero-card,.section-shell,.reveal-shell,.panel-card,.form-shell,.intro-card {
+            border-radius: var(--radius-xl); box-shadow: var(--shadow);
+        }
+        .hero-card {
+            display: grid; grid-template-columns: minmax(0,1.1fr) minmax(320px,.9fr); gap: 2rem; padding: 3rem;
+            background: radial-gradient(circle at 86% 18%, rgba(255,241,204,.22), transparent 18%),
+                        linear-gradient(135deg, rgba(183,38,61,.98), rgba(20,78,57,.98));
+            border: 1px solid rgba(255,255,255,.08); position: relative; overflow: hidden;
+        }
+        .hero-pill,.badge-soft,.feature-kicker {
+            display: inline-flex; align-items: center; border-radius: 999px; padding: .45rem .85rem;
+            font-size: .8rem; letter-spacing: .08em; text-transform: uppercase;
+        }
+        .hero-pill { background: rgba(255,255,255,.14); color: var(--gold-soft); }
+        .hero-copy h1,.page-title,.section-header h2,.event-card h3,.feature-card h3,.empty-state h3 {
+            font-family: Georgia, "Times New Roman", serif;
+        }
+        .hero-copy h1 { margin: 1rem 0; font-size: clamp(2.8rem,5vw,4.8rem); line-height: 1.02; }
+        .hero-copy p { margin: 0; max-width: 38rem; line-height: 1.8; font-size: 1.08rem; color: rgba(255,250,241,.9); }
+        .hero-actions,.section-header,.detail-actions,.stack-actions { display:flex; gap:1rem; flex-wrap:wrap; align-items:center; }
+        .hero-actions { margin-top: 1.5rem; }
+        .hero-mini-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; margin-top:1.5rem; }
+        .hero-mini-card {
+            display:flex; gap:.8rem; align-items:flex-start; padding:1rem 1.1rem; border-radius:22px;
+            background: rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.08);
+        }
+        .mini-icon { font-size:1.35rem; line-height:1; }
+        .hero-mini-card strong { display:block; margin-bottom:.15rem; }
+        .hero-mini-card p { margin:0; font-size:.94rem; line-height:1.6; }
+        .hero-visual { display:grid; gap:1rem; }
+        .hero-scene {
+            position:relative; min-height:360px; border-radius:28px; overflow:hidden;
+            background: radial-gradient(circle at 60% 18%, rgba(255,248,210,.85), rgba(255,248,210,.06) 22%, transparent 24%),
+                        linear-gradient(180deg, rgba(5,33,24,.18), rgba(5,33,24,.45));
+            border:1px solid rgba(255,255,255,.08);
+        }
+        .moon-glow {
+            position:absolute; top:1.2rem; right:2.4rem; width:5.8rem; height:5.8rem; border-radius:50%;
+            background: radial-gradient(circle, #fff7c8 0%, rgba(255,247,200,.85) 46%, rgba(255,247,200,.12) 70%, transparent 72%);
+        }
+        .tree { position:absolute; bottom:5.2rem; width:0; height:0; border-left:3.1rem solid transparent; border-right:3.1rem solid transparent; border-bottom:5.4rem solid #114031; }
+        .tree::before,.tree::after {
+            content:""; position:absolute; left:-2.4rem; width:0; height:0; border-left:2.4rem solid transparent; border-right:2.4rem solid transparent; border-bottom:4rem solid #16523f;
+        }
+        .tree::before { top:1.8rem; }
+        .tree::after { top:3.2rem; border-bottom-color:#0f3a2d; }
+        .tree-left { left:2.4rem; transform:scale(.88); }
+        .tree-center { left:8.7rem; transform:scale(1.08); }
+        .tree-right { right:4.2rem; transform:scale(.95); }
+        .snow-hill { position:absolute; left:-10%; right:-10%; border-radius:50%; background:linear-gradient(180deg, #fffefb, #dfe9e1); }
+        .snow-hill-back { bottom:2.8rem; height:7rem; opacity:.86; }
+        .snow-hill-front { bottom:-2.8rem; height:8rem; }
+        .hero-gift-stack { position:absolute; bottom:3rem; left:50%; transform:translateX(-50%); display:flex; align-items:end; gap:1rem; }
+        .gift { position:relative; border-radius:22px; box-shadow:0 20px 30px rgba(0,0,0,.16); }
+        .gift::before,.gift::after { content:""; position:absolute; background:rgba(255,244,218,.95); }
+        .gift::before { left:50%; top:0; transform:translateX(-50%); width:14%; height:100%; }
+        .gift::after { left:0; top:42%; width:100%; height:14%; }
+        .gift-large { width:7.3rem; height:8rem; background:linear-gradient(180deg,#d4364c,#941b2d); }
+        .gift-small { width:5.8rem; height:5.8rem; background:linear-gradient(180deg,#f0ce69,#c7921d); }
+        .gift-tall { width:6.2rem; height:9.4rem; background:linear-gradient(180deg,#1ea06b,#116647); }
+        .hero-stats,.event-grid,.dashboard-grid,.detail-grid,.participant-grid,.feature-strip { display:grid; gap:1.25rem; }
+        .hero-stats { grid-template-columns: repeat(3,1fr); }
+        .dashboard-grid,.detail-grid { grid-template-columns:1.05fr .95fr; }
+        .event-grid,.participant-grid,.feature-strip { grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
+        .stat-card,.event-card,.panel-card,.result-card,.empty-state,.form-shell,.intro-card,.participant-card,.feature-card {
+            background: var(--card); color: var(--ink); border-radius:24px; padding:1.4rem;
+        }
+        .stat-card { text-align:center; padding:1.25rem 1rem; }
+        .stat-card strong { display:block; font-size:2rem; color:var(--red); }
+        .section-shell,.reveal-shell {
+            margin-top:2rem; padding:2rem; background:var(--glass); border:1px solid var(--border); backdrop-filter:blur(12px);
+        }
+        .section-shell-soft { background:transparent; border:none; box-shadow:none; padding:0; }
+        .feature-card { background:linear-gradient(180deg, rgba(255,250,241,.96), rgba(244,236,220,.92)); }
+        .feature-kicker { background:rgba(226,187,86,.18); color:#8b6710; }
+        .feature-card h3 { margin:.7rem 0 .4rem; }
+        .feature-card p { margin:0; line-height:1.7; color:rgba(29,36,31,.78); }
+        .event-card-top { display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
+        .badge-soft { background:rgba(15,75,58,.1); color:var(--green); }
+        .event-meta,.summary-list,.event-meta div,.summary-list div { display:grid; gap:.25rem; }
+        .event-meta dt,.summary-list dt { font-size:.8rem; text-transform:uppercase; color:rgba(29,36,31,.52); }
+        .event-meta dd,.summary-list dd { margin:0; font-weight:700; }
+        .btn {
+            border:0; border-radius:999px; padding:.82rem 1.3rem; font-weight:800;
+            transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-gold,.btn-christmas { color:white; }
+        .btn-gold { background:linear-gradient(180deg,#efcf72,#cf9a22); box-shadow:0 14px 28px rgba(207,154,34,.3); }
+        .btn-christmas { background:linear-gradient(180deg,#cc3449,#941b2c); box-shadow:0 14px 28px rgba(148,27,44,.28); }
+        .btn-outline-light { color:var(--cream); border:1px solid rgba(255,255,255,.42); background:rgba(255,255,255,.04); }
+        .btn-outline-forest { color:var(--green); border:1px solid rgba(15,75,58,.28); background:transparent; }
+        .form-control,.form-select { border-radius:16px; border:1px solid rgba(29,36,31,.12); padding:.9rem 1rem; }
+        .festive-alert { border:0; border-radius:18px; }
+        .gift-box {
+            width:min(280px,70vw); aspect-ratio:1; border:0; border-radius:32px; margin:0 auto;
+            background:
+                linear-gradient(90deg, transparent 45%, rgba(255,236,179,.95) 45%, rgba(255,236,179,.95) 55%, transparent 55%),
+                linear-gradient(180deg, transparent 42%, rgba(255,236,179,.95) 42%, rgba(255,236,179,.95) 58%, transparent 58%),
+                linear-gradient(180deg, #c92a39, #8e1522);
+            box-shadow:0 24px 40px rgba(0,0,0,.22); position:relative; animation:giftBounce 1.8s ease-in-out infinite;
+        }
+        .gift-box::before,.gift-box::after {
+            content:""; position:absolute; top:12%; width:28%; height:18%; border:10px solid #f7e6a8; border-radius:50% 50% 10% 10%;
+        }
+        .gift-box::before { left:20%; transform:rotate(-18deg); }
+        .gift-box::after { right:20%; transform:rotate(18deg); }
+        .gift-box.opened { animation:none; transform:scale(1.04) rotate(-2deg); }
+        .rolling-names { min-height:4rem; display:grid; place-items:center; margin:1.5rem 0; color:var(--gold); font-size:1.4rem; text-shadow:0 6px 16px rgba(0,0,0,.18); }
+        .drawn-name { font-size:clamp(2rem,4vw,3.4rem); color:var(--red); }
+        .secret-chip { display:inline-block; border-radius:999px; padding:.35rem .75rem; background:rgba(15,75,58,.12); color:var(--green); font-size:.9rem; font-weight:700; }
+        .footer-shell { padding:0 0 2rem; color:rgba(255,250,241,.72); }
+        .snow-layer { position:fixed; inset:0; pointer-events:none; z-index:1; overflow:hidden; }
+        .snowflake { position:absolute; top:-10vh; color:rgba(255,255,255,.82); text-shadow:0 0 10px rgba(255,255,255,.16); animation:snowFall linear infinite; }
+        .snowflake:nth-child(1){left:4%;font-size:1rem;animation-duration:11s;animation-delay:-1s;}
+        .snowflake:nth-child(2){left:12%;font-size:1.5rem;animation-duration:15s;animation-delay:-4s;}
+        .snowflake:nth-child(3){left:19%;font-size:.95rem;animation-duration:12s;animation-delay:-8s;}
+        .snowflake:nth-child(4){left:28%;font-size:1.25rem;animation-duration:18s;animation-delay:-3s;}
+        .snowflake:nth-child(5){left:35%;font-size:.8rem;animation-duration:10s;animation-delay:-6s;}
+        .snowflake:nth-child(6){left:42%;font-size:1.35rem;animation-duration:16s;animation-delay:-2s;}
+        .snowflake:nth-child(7){left:50%;font-size:1rem;animation-duration:13s;animation-delay:-7s;}
+        .snowflake:nth-child(8){left:58%;font-size:.9rem;animation-duration:14s;animation-delay:-5s;}
+        .snowflake:nth-child(9){left:64%;font-size:1.45rem;animation-duration:17s;animation-delay:-9s;}
+        .snowflake:nth-child(10){left:70%;font-size:1rem;animation-duration:12s;animation-delay:-4s;}
+        .snowflake:nth-child(11){left:78%;font-size:1.4rem;animation-duration:19s;animation-delay:-11s;}
+        .snowflake:nth-child(12){left:84%;font-size:.95rem;animation-duration:13s;animation-delay:-8s;}
+        .snowflake:nth-child(13){left:88%;font-size:1.3rem;animation-duration:16s;animation-delay:-2s;}
+        .snowflake:nth-child(14){left:92%;font-size:.9rem;animation-duration:11s;animation-delay:-10s;}
+        .snowflake:nth-child(15){left:96%;font-size:1.2rem;animation-duration:18s;animation-delay:-5s;}
+        .snowflake:nth-child(16){left:24%;font-size:.85rem;animation-duration:20s;animation-delay:-12s;}
+        @@keyframes snowFall {
+            0% { transform:translate3d(0,-10vh,0) rotate(0deg); opacity:0; }
+            10% { opacity:1; }
+            100% { transform:translate3d(24px,115vh,0) rotate(180deg); opacity:.9; }
+        }
+        @@keyframes giftBounce {
+            0%,100% { transform:translateY(0); }
+            50% { transform:translateY(-10px); }
+        }
+        @@media (max-width: 991px) {
+            .nav-shell,.nav-links,.hero-actions,.section-header,.detail-actions,.stack-actions { flex-direction:column; align-items:stretch; }
+            .hero-card,.dashboard-grid,.detail-grid,.hero-mini-grid,.hero-stats { grid-template-columns:1fr; }
+            .brand-copy strong { font-size:1.2rem; }
+            .brand-icon { width: 3.8rem; height: 3.8rem; }
+            .hero-card { padding:2rem; }
+            .hero-scene { min-height:300px; }
+        }
+    </style>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ChristmasGiftExchange.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="snow-layer" aria-hidden="true">
+        <span class="snowflake">✦</span>
+        <span class="snowflake">❄</span>
+        <span class="snowflake">✦</span>
+        <span class="snowflake">❄</span>
+        <span class="snowflake">•</span>
+        <span class="snowflake">✦</span>
+        <span class="snowflake">❄</span>
+        <span class="snowflake">•</span>
+        <span class="snowflake">❄</span>
+        <span class="snowflake">✦</span>
+        <span class="snowflake">❄</span>
+        <span class="snowflake">•</span>
+        <span class="snowflake">✦</span>
+        <span class="snowflake">❄</span>
+        <span class="snowflake">✦</span>
+        <span class="snowflake">•</span>
+    </div>
+    <header class="topbar">
+        <nav class="nav-shell container">
+            <a class="brand-mark" asp-controller="Home" asp-action="Index">
+                <span class="brand-icon" aria-hidden="true">
+                    <img src="https://img.lovepik.com/png/20231106/christmas-beautiful-christmas-tree-illustration-Christmas-theme-beauty-galas_512700_wh860.png" alt="聖誕樹 logo" />
+                </span>
+                <span class="brand-copy">
+                    <strong>交換禮物抽籤網站</strong>
+                    <small>Christmas Gift Exchange</small>
+                </span>
+            </a>
+            <div class="nav-links">
+                <a class="nav-link" asp-controller="Home" asp-action="Index">首頁</a>
+                <a class="nav-link" asp-controller="Events" asp-action="Index">活動列表</a>
+                <a class="btn btn-gold nav-button" asp-controller="Events" asp-action="Create">建立活動</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="page-shell">
+        <div class="container">
+            @if (TempData["FlashMessage"] is string flashMessage)
+            {
+                <div class="alert alert-success festive-alert" role="alert">@flashMessage</div>
+            }
+            @if (TempData["FlashError"] is string flashError)
+            {
+                <div class="alert alert-danger festive-alert" role="alert">@flashError</div>
+            }
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="footer-shell">
+        <div class="container d-flex flex-column flex-lg-row justify-content-between gap-2">
+            <span>聖誕節交換禮物抽籤網站</span>
+            <span>讓抽籤公平，也讓驚喜更有儀式感。</span>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

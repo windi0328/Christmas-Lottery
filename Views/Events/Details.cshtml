@@ -1,0 +1,168 @@
+@model ChristmasGiftExchange.ViewModels.EventDetailsViewModel
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<section class="hero-card">
+    <div class="hero-copy">
+        <span class="hero-pill">Event Detail</span>
+        <h1>@Model.Name</h1>
+        <p>@Model.Description</p>
+        <div class="detail-actions">
+            @if (!Model.HasDrawResults)
+            {
+                <a class="btn btn-gold" asp-action="DrawCountdown" asp-route-id="@Model.Id">開始抽籤</a>
+            }
+            else
+            {
+                <form asp-action="ResetDraw" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-christmas">重新抽籤</button>
+                </form>
+            }
+            <a class="btn btn-outline-light" asp-action="Reveal" asp-route-eventId="@Model.Id">前往揭曉頁</a>
+            <form asp-action="Delete" method="post" onsubmit="return confirm('確定要刪除活動「@Model.Name」嗎？');">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="btn btn-outline-forest">刪除活動</button>
+            </form>
+        </div>
+    </div>
+    <div class="hero-stats">
+        <div class="stat-card">
+            <strong>@Model.Participants.Count</strong>
+            <span>參與者</span>
+        </div>
+        <div class="stat-card">
+            <strong>NT$ @Model.Budget.ToString("N0")</strong>
+            <span>預算金額</span>
+        </div>
+        <div class="stat-card">
+            <strong>@Model.EventDate.ToString("MM/dd")</strong>
+            <span>@Model.Location</span>
+        </div>
+    </div>
+</section>
+
+@if (!Model.HasDrawResults)
+{
+    <div class="draw-overlay" data-draw-overlay hidden>
+        <div class="draw-overlay-card">
+            <span class="hero-pill">Gift Draw</span>
+            <h2>聖誕精靈正在交換禮物</h2>
+            <p>5 秒後自動完成公平抽籤並跳轉。</p>
+            <div class="draw-stars">
+                <span>✦</span>
+                <span>❄</span>
+                <span>✦</span>
+                <span>❄</span>
+                <span>✦</span>
+            </div>
+            <div class="draw-gift-row">
+                <div class="draw-mini-gift draw-mini-gift-red"></div>
+                <div class="draw-mini-gift draw-mini-gift-gold"></div>
+                <div class="draw-mini-gift draw-mini-gift-green"></div>
+            </div>
+            <div class="draw-countdown" data-draw-countdown>5</div>
+            <div class="draw-status">正在準備抽籤結果...</div>
+        </div>
+    </div>
+}
+
+<section class="section-shell">
+    <div class="detail-grid">
+        <div class="panel-card">
+            <h2>活動資訊</h2>
+            <dl class="summary-list">
+                <div>
+                    <dt>活動日期</dt>
+                    <dd>@Model.EventDate.ToString("yyyy/MM/dd HH:mm")</dd>
+                </div>
+                <div>
+                    <dt>報名截止</dt>
+                    <dd>@Model.RegistrationDeadline.ToString("yyyy/MM/dd HH:mm")</dd>
+                </div>
+                <div>
+                    <dt>活動地點</dt>
+                    <dd>@Model.Location</dd>
+                </div>
+                <div>
+                    <dt>目前狀態</dt>
+                    <dd>@(Model.HasDrawResults ? "已完成抽籤" : "等待抽籤")</dd>
+                </div>
+            </dl>
+        </div>
+
+        <div class="panel-card">
+            <h2>新增參與者</h2>
+            <p>可選填 Email 與小提示，讓寄信和揭曉更有驚喜。</p>
+            <form asp-action="AddParticipant" method="post" class="row g-3">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="eventId" value="@Model.Id" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="col-12">
+                    <label asp-for="NewParticipant.Name" class="form-label"></label>
+                    <input asp-for="NewParticipant.Name" class="form-control" />
+                    <span asp-validation-for="NewParticipant.Name" class="text-danger"></span>
+                </div>
+                <div class="col-12">
+                    <label asp-for="NewParticipant.Email" class="form-label"></label>
+                    <input asp-for="NewParticipant.Email" class="form-control" />
+                    <span asp-validation-for="NewParticipant.Email" class="text-danger"></span>
+                </div>
+                <div class="col-12">
+                    <label asp-for="NewParticipant.WishlistHint" class="form-label"></label>
+                    <textarea asp-for="NewParticipant.WishlistHint" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="NewParticipant.WishlistHint" class="text-danger"></span>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-christmas" @(Model.HasDrawResults ? "disabled" : null)>加入參與者</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="section-shell">
+    <div class="section-header">
+        <div>
+            <h2>參與者與專屬通關碼</h2>
+            <p>抽籤後每個人都能用自己的通關碼，只看到自己的結果。</p>
+        </div>
+    </div>
+
+    @if (Model.Participants.Any())
+    {
+        <div class="participant-grid">
+            @foreach (var participant in Model.Participants)
+            {
+                <article class="participant-card">
+                    <h3>@participant.Name</h3>
+                    <p>@(string.IsNullOrWhiteSpace(participant.Email) ? "未填寫 Email" : participant.Email)</p>
+                    @if (!string.IsNullOrWhiteSpace(participant.WishlistHint))
+                    {
+                        <p class="secret-chip">@participant.WishlistHint</p>
+                    }
+                    <p>通關碼：<strong>@participant.AccessCode</strong></p>
+                    <div class="stack-actions">
+                        <a class="btn btn-outline-forest" href="@participant.RevealUrl">個人揭曉連結</a>
+                        <form asp-action="DeleteParticipant" method="post" onsubmit="return confirm('確定要刪除 @participant.Name 嗎？');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="eventId" value="@Model.Id" />
+                            <input type="hidden" name="participantId" value="@participant.Id" />
+                            <button type="submit" class="btn btn-christmas" @(Model.HasDrawResults ? "disabled" : null)>刪除參與者</button>
+                        </form>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <h3>尚未加入任何參與者</h3>
+            <p>至少需要 2 位參與者才能執行抽籤。</p>
+        </div>
+    }
+</section>

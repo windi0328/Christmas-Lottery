@@ -1,0 +1,69 @@
+@model IReadOnlyList<ChristmasGiftExchange.ViewModels.EventListItemViewModel>
+@{
+    ViewData["Title"] = "活動列表";
+}
+
+<section class="intro-card">
+    <div class="section-header">
+        <div>
+            <span class="hero-pill">Event Hub</span>
+            <h1 class="page-title">交換禮物活動列表</h1>
+            <p>管理所有活動、查看參與者數量，並快速進入抽籤頁。</p>
+        </div>
+        <a class="btn btn-gold" asp-action="Create">建立新活動</a>
+    </div>
+</section>
+
+@if (Model.Any())
+{
+    <section class="section-shell">
+        <div class="event-grid">
+            @foreach (var item in Model)
+            {
+                <article class="event-card">
+                    <div class="event-card-top">
+                        <span class="badge-soft">@(item.HasDrawResults ? "驚喜已封存" : "尚未抽籤")</span>
+                        <span>@item.EventDate.ToString("yyyy/MM/dd HH:mm")</span>
+                    </div>
+                    <h3>@item.Name</h3>
+                    <p>@item.Description</p>
+                    <dl class="event-meta">
+                        <div>
+                            <dt>地點</dt>
+                            <dd>@item.Location</dd>
+                        </div>
+                        <div>
+                            <dt>截止</dt>
+                            <dd>@item.RegistrationDeadline.ToString("MM/dd HH:mm")</dd>
+                        </div>
+                        <div>
+                            <dt>預算</dt>
+                            <dd>NT$ @item.Budget.ToString("N0")</dd>
+                        </div>
+                        <div>
+                            <dt>人數</dt>
+                            <dd>@item.ParticipantCount 位</dd>
+                        </div>
+                    </dl>
+                    <div class="stack-actions">
+                        <a class="btn btn-christmas" asp-action="Details" asp-route-id="@item.Id">查看詳情</a>
+                        <form asp-action="Delete" method="post" onsubmit="return confirm('確定要刪除活動「@item.Name」嗎？');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-outline-forest">刪除活動</button>
+                        </form>
+                    </div>
+                </article>
+            }
+        </div>
+    </section>
+}
+else
+{
+    <section class="section-shell">
+        <div class="empty-state">
+            <h3>活動清單還是空的</h3>
+            <p>先建立一個聖誕交換禮物活動，接著就能開始招募參與者。</p>
+        </div>
+    </section>
+}
