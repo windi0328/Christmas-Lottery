@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>聖誕節交換禮物抽籤網站</title>
+    <meta name="description" content="GitHub Pages 版聖誕節交換禮物抽籤網站，使用 localStorage 保存活動與抽籤結果。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <div class="snow-layer" aria-hidden="true">
+        <span class="snowflake">✦</span>
+        <span class="snowflake">❄</span>
+        <span class="snowflake">✦</span>
+        <span class="snowflake">❄</span>
+        <span class="snowflake">•</span>
+        <span class="snowflake">✦</span>
+        <span class="snowflake">❄</span>
+        <span class="snowflake">•</span>
+        <span class="snowflake">❄</span>
+        <span class="snowflake">✦</span>
+        <span class="snowflake">❄</span>
+        <span class="snowflake">•</span>
+    </div>
+
+    <header class="topbar">
+        <div class="container topbar-inner">
+            <a class="brand-mark" href="#top">
+                <span class="brand-icon">
+                    <img src="https://img.lovepik.com/png/20231106/christmas-beautiful-christmas-tree-illustration-Christmas-theme-beauty-galas_512700_wh860.png" alt="聖誕樹">
+                </span>
+                <span class="brand-copy">
+                    <strong>交換禮物抽籤網站</strong>
+                    <small>Christmas Gift Exchange</small>
+                </span>
+            </a>
+            <nav class="nav-links">
+                <a href="#create">建立活動</a>
+                <a href="#events">活動管理</a>
+                <a href="#reveal">揭曉結果</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-shell" id="top">
+        <section class="hero">
+            <div class="container hero-grid">
+                <div class="hero-copy">
+                    <span class="pill">GitHub Pages Edition</span>
+                    <h1>免費部署版聖誕交換禮物抽籤</h1>
+                    <p>這一版完全改成純前端網站，資料會存進你的瀏覽器 localStorage。可以建立活動、加入參與者、抽籤、重抽，還能用通關碼各自揭曉。</p>
+                    <div class="hero-actions">
+                        <a class="btn btn-gold" href="#create">立即建立活動</a>
+                        <a class="btn btn-ghost" href="#reveal">前往揭曉頁</a>
+                    </div>
+                    <div class="hero-tip">
+                        <strong>提醒</strong>
+                        <span>資料只會存在你目前這台裝置的瀏覽器裡，換電腦或清除瀏覽器資料就會消失。</span>
+                    </div>
+                </div>
+                <div class="hero-scene">
+                    <div class="moon-glow"></div>
+                    <div class="tree tree-left"></div>
+                    <div class="tree tree-center"></div>
+                    <div class="tree tree-right"></div>
+                    <div class="gift-stack">
+                        <div class="gift gift-red"></div>
+                        <div class="gift gift-gold"></div>
+                        <div class="gift gift-green"></div>
+                    </div>
+                    <div class="snow-hill snow-hill-back"></div>
+                    <div class="snow-hill snow-hill-front"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats container">
+            <article class="stat-card">
+                <span>活動數</span>
+                <strong id="stats-events">0</strong>
+            </article>
+            <article class="stat-card">
+                <span>參與者數</span>
+                <strong id="stats-participants">0</strong>
+            </article>
+            <article class="stat-card">
+                <span>已完成抽籤</span>
+                <strong id="stats-drawn">0</strong>
+            </article>
+        </section>
+
+        <div class="container flash-stack" id="flash-stack" aria-live="polite"></div>
+
+        <section class="container section-shell" id="create">
+            <div class="section-header">
+                <div>
+                    <span class="pill">Create Event</span>
+                    <h2>建立交換禮物活動</h2>
+                    <p>建立一個活動後，就能加入參與者並進行公平抽籤。</p>
+                </div>
+            </div>
+            <form id="event-form" class="form-grid">
+                <label>
+                    <span>活動名稱</span>
+                    <input type="text" name="name" placeholder="例如：公司聖誕交換禮物" required>
+                </label>
+                <label>
+                    <span>活動日期</span>
+                    <input type="datetime-local" name="eventDate" required>
+                </label>
+                <label class="wide">
+                    <span>活動描述</span>
+                    <textarea name="description" rows="3" placeholder="寫下活動主題、dress code 或玩法"></textarea>
+                </label>
+                <label>
+                    <span>活動地點</span>
+                    <input type="text" name="location" placeholder="例如：會議室 / 餐廳 / 線上">
+                </label>
+                <label>
+                    <span>報名截止</span>
+                    <input type="datetime-local" name="registrationDeadline" required>
+                </label>
+                <label>
+                    <span>預算金額</span>
+                    <input type="number" name="budget" min="0" step="1" placeholder="1000" required>
+                </label>
+                <div class="wide form-actions">
+                    <button type="submit" class="btn btn-gold">建立活動</button>
+                    <button type="reset" class="btn btn-muted">清空</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="container section-shell" id="events">
+            <div class="section-header">
+                <div>
+                    <span class="pill">Event Hub</span>
+                    <h2>活動管理</h2>
+                    <p>選擇一個活動來加入參與者、刪除資料、抽籤或重抽。</p>
+                </div>
+            </div>
+            <div id="event-list" class="event-grid"></div>
+            <div id="event-empty" class="empty-state">
+                <h3>目前還沒有任何活動</h3>
+                <p>先建立第一個活動，接著就能加入參與者並開始抽籤。</p>
+            </div>
+        </section>
+
+        <section class="container detail-shell hidden" id="event-detail-section">
+            <div class="section-header">
+                <div>
+                    <span class="pill">Event Detail</span>
+                    <h2 id="detail-name">活動詳情</h2>
+                    <p id="detail-description">管理參與者、執行抽籤，並查看每位參與者的專屬通關碼。</p>
+                </div>
+                <div class="detail-actions">
+                    <button id="draw-button" class="btn btn-gold">開始公平抽籤</button>
+                    <button id="reset-draw-button" class="btn btn-ghost">重抽</button>
+                    <button id="delete-event-button" class="btn btn-danger">刪除活動</button>
+                </div>
+            </div>
+
+            <div class="detail-grid">
+                <article class="panel-card">
+                    <h3>活動資訊</h3>
+                    <dl class="summary-list" id="detail-summary"></dl>
+                </article>
+
+                <article class="panel-card">
+                    <h3>新增參與者</h3>
+                    <p>每位參與者都會產生自己的通關碼，用來在揭曉頁查看抽到的人。</p>
+                    <form id="participant-form" class="form-grid compact">
+                        <label>
+                            <span>姓名</span>
+                            <input type="text" name="name" required>
+                        </label>
+                        <label>
+                            <span>Email（選填）</span>
+                            <input type="email" name="email">
+                        </label>
+                        <label class="wide">
+                            <span>小提示（選填）</span>
+                            <textarea name="wishlistHint" rows="3" placeholder="例如：喜歡巧克力、不喝咖啡、想要暖暖包"></textarea>
+                        </label>
+                        <div class="wide form-actions">
+                            <button type="submit" class="btn btn-christmas">加入參與者</button>
+                        </div>
+                    </form>
+                </article>
+            </div>
+
+            <article class="panel-card">
+                <div class="section-header">
+                    <div>
+                        <h3>參與者與通關碼</h3>
+                        <p>抽籤後每個人只要知道自己的通關碼，就能單獨揭曉結果。</p>
+                    </div>
+                </div>
+                <div id="participant-list" class="participant-grid"></div>
+                <div id="participant-empty" class="empty-state compact">
+                    <h3>還沒有參與者</h3>
+                    <p>至少需要 2 位參與者才能抽籤。</p>
+                </div>
+            </article>
+        </section>
+
+        <section class="container section-shell" id="reveal">
+            <div class="section-header">
+                <div>
+                    <span class="pill">Reveal Portal</span>
+                    <h2>個人揭曉頁</h2>
+                    <p>輸入自己的名字與通關碼，只會看到自己抽到的那一位。</p>
+                </div>
+            </div>
+
+            <div class="detail-grid">
+                <article class="panel-card">
+                    <form id="reveal-form" class="form-grid compact">
+                        <label class="wide">
+                            <span>活動</span>
+                            <select id="reveal-event-select" required></select>
+                        </label>
+                        <label>
+                            <span>我是誰</span>
+                            <select id="reveal-participant-select" required></select>
+                        </label>
+                        <label>
+                            <span>專屬通關碼</span>
+                            <input id="reveal-access-code" type="text" placeholder="例如：5A81C2F0" required>
+                        </label>
+                        <div class="wide form-actions">
+                            <button type="submit" class="btn btn-gold">準備揭曉</button>
+                        </div>
+                    </form>
+                </article>
+
+                <article class="panel-card reveal-card">
+                    <button id="gift-box-button" class="gift-box-button" type="button" disabled aria-label="拆開禮物盒">
+                        <span class="gift-box-visual"></span>
+                    </button>
+                    <p id="reveal-status" class="reveal-status">先完成名字與通關碼驗證，才能拆開禮物盒。</p>
+                    <div id="rolling-names" class="rolling-names">等待揭曉</div>
+                    <div id="reveal-result" class="reveal-result hidden">
+                        <span class="pill">Your Match</span>
+                        <h3 id="reveal-name">你抽到的是</h3>
+                        <p id="reveal-hint" class="hint-text"></p>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <template id="event-card-template">
+        <article class="event-card">
+            <div class="event-card-head">
+                <span class="badge"></span>
+                <span class="event-date"></span>
+            </div>
+            <h3 class="event-name"></h3>
+            <p class="event-description"></p>
+            <dl class="event-meta"></dl>
+            <div class="event-actions">
+                <button class="btn btn-christmas select-event" type="button">管理活動</button>
+                <button class="btn btn-ghost open-reveal" type="button">前往揭曉</button>
+            </div>
+        </article>
+    </template>
+
+    <template id="participant-card-template">
+        <article class="participant-card">
+            <div class="participant-top">
+                <h4 class="participant-name"></h4>
+                <button class="icon-button delete-participant" type="button" aria-label="刪除參與者">×</button>
+            </div>
+            <p class="participant-email"></p>
+            <p class="participant-hint"></p>
+            <p class="participant-code"></p>
+            <p class="participant-match hidden"></p>
+        </article>
+    </template>
+
+    <script src="./app.js"></script>
+</body>
+</html>
