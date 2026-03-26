@@ -47,6 +47,7 @@ button, input, textarea, select { font: inherit; }
 }
 
 .topbar-inner {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -119,6 +120,7 @@ button, input, textarea, select { font: inherit; }
     flex-direction: column;
     gap: 0.28rem;
     cursor: pointer;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
 }
 
 .hamburger-button span {
@@ -240,23 +242,6 @@ button, input, textarea, select { font: inherit; }
     margin-top: 1.6rem;
 }
 
-.hero-tip {
-    margin-top: 1.5rem;
-    display: grid;
-    gap: 0.25rem;
-    padding: 1rem 1.1rem;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.hero-tip strong {
-    color: var(--gold-soft);
-}
-
-.hero-tip span {
-    color: var(--text-mid);
-}
-
 .hero-scene {
     position: relative;
     min-height: 420px;
@@ -308,6 +293,73 @@ button, input, textarea, select { font: inherit; }
 .tree-left { left: 2rem; transform: scale(0.9); }
 .tree-center { left: 8.3rem; transform: scale(1.08); }
 .tree-right { right: 4rem; transform: scale(0.96); }
+
+.hero-tree {
+    position: absolute;
+    left: 50%;
+    bottom: 5.2rem;
+    width: 180px;
+    height: 230px;
+    transform: translateX(-50%);
+    z-index: 1;
+}
+
+.tree-star {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    background: radial-gradient(circle, #fff7cd 0%, #f0ca5a 62%, #d69c15 100%);
+    clip-path: polygon(50% 0%, 61% 34%, 98% 35%, 68% 57%, 79% 91%, 50% 71%, 21% 91%, 32% 57%, 2% 35%, 39% 34%);
+    transform: translateX(-50%);
+    box-shadow: 0 0 18px rgba(255, 232, 162, 0.7);
+}
+
+.tree-layer {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 68px solid transparent;
+    border-right: 68px solid transparent;
+    border-bottom: 78px solid #16734c;
+}
+
+.tree-layer-top {
+    top: 26px;
+    border-left-width: 42px;
+    border-right-width: 42px;
+    border-bottom-width: 58px;
+}
+
+.tree-layer-mid {
+    top: 68px;
+    border-left-width: 58px;
+    border-right-width: 58px;
+    border-bottom-width: 78px;
+    border-bottom-color: #1d8c5d;
+}
+
+.tree-layer-base {
+    top: 118px;
+    border-left-width: 78px;
+    border-right-width: 78px;
+    border-bottom-width: 98px;
+    border-bottom-color: #12573c;
+}
+
+.tree-trunk {
+    position: absolute;
+    left: 50%;
+    bottom: 4px;
+    width: 26px;
+    height: 46px;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #8d623f, #5a3721);
+    transform: translateX(-50%);
+}
 
 .gift-stack {
     position: absolute;
@@ -363,7 +415,7 @@ button, input, textarea, select { font: inherit; }
 .snow-hill-front { bottom: -2.8rem; height: 8rem; }
 
 .stats {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     margin-bottom: 1.5rem;
 }
 
@@ -883,12 +935,21 @@ button, input, textarea, select { font: inherit; }
 
     .hamburger-button {
         display: inline-flex;
+        position: absolute;
+        left: 50%;
+        top: 5.5rem;
+        transform: translateX(-50%);
+        width: 4rem;
+        height: 4rem;
+        background: rgba(255, 255, 255, 0.12);
     }
 
     .nav-links {
         display: none;
         width: 100%;
-        padding-top: 0.5rem;
+        padding: 5.5rem 1rem 0.75rem;
+        border-radius: 36px;
+        background: rgba(11, 38, 29, 0.86);
     }
 
     .nav-links.open {
@@ -903,4 +964,9 @@ button, input, textarea, select { font: inherit; }
     .event-meta,
     .summary-list { grid-template-columns: 1fr; }
     .gift-box-button { width: 220px; height: 220px; }
+    .hero-tree {
+        width: 140px;
+        height: 190px;
+        bottom: 4.2rem;
+    }
 }

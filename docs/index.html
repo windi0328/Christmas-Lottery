@@ -61,16 +61,19 @@
                         <button class="btn btn-gold" type="button" data-tab-target="settings">開始建立活動</button>
                         <button class="btn btn-ghost" type="button" data-tab-target="draw">前往抽獎結果</button>
                     </div>
-                    <div class="hero-tip">
-                        <strong>同一支手機完成</strong>
-                        <span>所有操作都在同一裝置進行，資料會暫存在目前瀏覽器的 localStorage 中。</span>
-                    </div>
                 </div>
                 <div class="hero-scene">
                     <div class="moon-glow"></div>
                     <div class="tree tree-left"></div>
                     <div class="tree tree-center"></div>
                     <div class="tree tree-right"></div>
+                    <div class="hero-tree hero-tree-main">
+                        <span class="tree-star"></span>
+                        <span class="tree-layer tree-layer-top"></span>
+                        <span class="tree-layer tree-layer-mid"></span>
+                        <span class="tree-layer tree-layer-base"></span>
+                        <span class="tree-trunk"></span>
+                    </div>
                     <div class="gift-stack">
                         <div class="gift gift-red"></div>
                         <div class="gift gift-gold"></div>
@@ -83,10 +86,6 @@
         </section>
 
         <section class="stats container">
-            <article class="stat-card">
-                <span>活動數</span>
-                <strong id="stats-events">0</strong>
-            </article>
             <article class="stat-card">
                 <span>參與者數</span>
                 <strong id="stats-participants">0</strong>

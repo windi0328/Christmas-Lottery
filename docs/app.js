@@ -8,7 +8,6 @@ const ui = {
 };
 
 const els = {
-    statsEvents: document.querySelector("#stats-events"),
     statsParticipants: document.querySelector("#stats-participants"),
     statsDrawn: document.querySelector("#stats-drawn"),
     flashStack: document.querySelector("#flash-stack"),
@@ -142,7 +141,6 @@ function renderTabs() {
 function renderStats() {
     const participantCount = state.event?.participants.length ?? 0;
     const drawnCount = state.event?.assignments.length ? 1 : 0;
-    els.statsEvents.textContent = state.event ? "1" : "0";
     els.statsParticipants.textContent = String(participantCount);
     els.statsDrawn.textContent = String(drawnCount);
 }
